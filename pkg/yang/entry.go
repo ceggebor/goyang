@@ -1153,22 +1153,24 @@ func (e *Entry) Find(name string) *Entry {
 			pfxMap[i.Prefix.Name] = m.Prefix.Name
 		}
 
-		if prefix, _ := getPrefix(parts[0]); prefix != "" {
-			pfx, ok := pfxMap[prefix]
-			if !ok {
-				// This is an undefined prefix within our context, so
-				// we can't do anything about resolving it.
-				e.addError(fmt.Errorf("invalid module prefix %s within module %s, defined prefix map: %v", prefix, e.Name, pfxMap))
-				return nil
-			}
-			m, err := e.Modules().FindModuleByPrefix(pfx)
-			if err != nil {
-				e.addError(err)
-				return nil
-			}
-			if e.Node.(*Module) != m {
-				e = ToEntry(m)
-			}
+		prefix, _ := getPrefix(parts[0])
+		if prefix == "" {
+			prefix = e.Prefix.NName()
+		}
+		pfx, ok := pfxMap[prefix]
+		if !ok {
+			// This is an undefined prefix within our context, so
+			// we can't do anything about resolving it.
+			e.addError(fmt.Errorf("invalid module prefix %s within module %s, defined prefix map: %v", prefix, e.Name, pfxMap))
+			return nil
+		}
+		m, err := e.Modules().FindModuleByPrefix(pfx)
+		if err != nil {
+			e.addError(err)
+			return nil
+		}
+		if e.Node.(*Module) != m {
+			e = ToEntry(m)
 		}
 	}
 
@@ -1191,7 +1193,7 @@ func (e *Entry) Find(name string) *Entry {
 			switch part {
 			case ".":
 			case "", "..":
-				return nil
+				e = nil
 			default:
 				e = e.Dir[part]
 			}
