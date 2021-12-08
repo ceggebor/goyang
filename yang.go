@@ -48,9 +48,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/openconfig/goyang/pkg/indent"
-	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/pborman/getopt"
+	"github.com/vleijon/goyang/pkg/indent"
+	"github.com/vleijon/goyang/pkg/yang"
 )
 
 // Each format must register a formatter with register.  The function f will
