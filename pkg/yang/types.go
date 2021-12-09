@@ -28,7 +28,7 @@ import (
 // when traversing up a Node tree.
 type typeDictionary struct {
 	mu   sync.Mutex
-	dict map[Node]map[string]*Typedef
+	dict map[string]map[string]*Typedef
 }
 
 // typeDict is a protected global dictionary of all typedefs.
@@ -38,10 +38,10 @@ type typeDictionary struct {
 // that we plan for a single application to process completely independent YANG
 // modules where there may be conflicts between the modules or we plan to
 // process them completely independently of eachother.
-var typeDict = typeDictionary{dict: map[Node]map[string]*Typedef{}}
+var typeDict = typeDictionary{dict: map[string]map[string]*Typedef{}}
 
 // add adds an entry to the typeDictionary d.
-func (d *typeDictionary) add(n Node, name string, td *Typedef) {
+func (d *typeDictionary) add(n string, name string, td *Typedef) {
 	defer d.mu.Unlock()
 	d.mu.Lock()
 	if d.dict[n] == nil {
@@ -51,7 +51,7 @@ func (d *typeDictionary) add(n Node, name string, td *Typedef) {
 }
 
 // find returns the Typedef name define in node n, or nil.
-func (d *typeDictionary) find(n Node, name string) *Typedef {
+func (d *typeDictionary) find(n string, name string) *Typedef {
 	defer d.mu.Unlock()
 	d.mu.Lock()
 	if d.dict[n] == nil {
@@ -67,7 +67,7 @@ func (d *typeDictionary) findExternal(n Node, prefix, name string) (*Typedef, er
 	if root == nil {
 		return nil, fmt.Errorf("%s: unknown prefix: %s for type %s", Source(n), prefix, name)
 	}
-	if td := d.find(root, name); td != nil {
+	if td := d.find(root.GetPrefix(), name); td != nil {
 		return td, nil
 	}
 	if prefix != "" {
@@ -93,8 +93,11 @@ func (d *typeDictionary) typedefs() []*Typedef {
 // are no error conditions in this process as it is simply used to build up the
 // typedef dictionary.
 func addTypedefs(t Typedefer) {
+	root := RootNode(t)
+	rootPrefix := root.GetPrefix()
+
 	for _, td := range t.Typedefs() {
-		typeDict.add(t, td.Name, td)
+		typeDict.add(rootPrefix, td.Name, td)
 	}
 }
 
@@ -172,6 +175,7 @@ func (t *Type) resolve() (errs []error) {
 	rootPrefix := root.GetPrefix()
 
 	source := "unknown"
+
 check:
 	switch {
 	case td != nil:
@@ -182,24 +186,17 @@ check:
 		// If we have no prefix, or the prefix is what we call our own
 		// root, then we look in our ancestors for a typedef of name.
 		for n := Node(t); n != nil; n = n.ParentNode() {
-			if td = typeDict.find(n, name); td != nil {
-				break check
-			}
-		}
-		// We need to check our sub-modules as well
-		for _, in := range root.Include {
-			if td = typeDict.find(in.Module, name); td != nil {
+			if td = typeDict.find(rootPrefix, name); td != nil {
 				break check
 			}
 		}
 		var pname string
 		switch {
-		case prefix == "", prefix == root.Prefix.Name:
-			pname = root.Prefix.Name + ":" + t.Name
+		case prefix == "":
+			pname = rootPrefix + ":" + t.Name
 		default:
-			pname = fmt.Sprintf("%s[%s]:%s", prefix, root.Prefix.Name, t.Name)
+			pname = fmt.Sprintf("%s[%s]:%s", prefix, rootPrefix, t.Name)
 		}
-
 		return []error{fmt.Errorf("%s: unknown type: %s", Source(t), pname)}
 
 	default:
