@@ -422,6 +422,7 @@ type LeafList struct {
 	Extensions []*Statement `yang:"Ext"`
 
 	Config      *Value   `yang:"config"`
+	Default     *Value   `yang:"default"`
 	Description *Value   `yang:"description"`
 	IfFeature   []*Value `yang:"if-feature"`
 	MaxElements *Value   `yang:"max-elements"`
@@ -492,6 +493,7 @@ type Choice struct {
 	Anydata     []*AnyData   `yang:"anydata"`
 	Anyxml      []*AnyXML    `yang:"anyxml"`
 	Case        []*Case      `yang:"case"`
+	Choice      []*Choice    `yang:"choice"`
 	Config      *Value       `yang:"config"`
 	Container   []*Container `yang:"container"`
 	Default     *Value       `yang:"default"`

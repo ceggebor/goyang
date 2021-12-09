@@ -186,6 +186,7 @@ func (ms *Modules) FindModule(n Node) *Module {
 
 	// Try to read it in.
 	if err := ms.Read(name); err != nil {
+		fmt.Print("Module read error", err)
 		return nil
 	}
 	if n := m[rev]; n != nil {
