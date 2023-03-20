@@ -652,15 +652,15 @@ type Refine struct {
 	Parent     Node         `yang:"Parent,nomerge"`
 	Extensions []*Statement `yang:"Ext"`
 
-	Default     *Value  `yang:"default"`
-	Description *Value  `yang:"description"`
-	Reference   *Value  `yang:"reference"`
-	Config      *Value  `yang:"config"`
-	Mandatory   *Value  `yang:"mandatory"`
-	Presence    *Value  `yang:"presence"`
-	Must        []*Must `yang:"must"`
-	MaxElements *Value  `yang:"max-elements"`
-	MinElements *Value  `yang:"min-elements"`
+	Default     []*Value `yang:"default"`
+	Description *Value   `yang:"description"`
+	Reference   *Value   `yang:"reference"`
+	Config      *Value   `yang:"config"`
+	Mandatory   *Value   `yang:"mandatory"`
+	Presence    *Value   `yang:"presence"`
+	Must        []*Must  `yang:"must"`
+	MaxElements *Value   `yang:"max-elements"`
+	MinElements *Value   `yang:"min-elements"`
 }
 
 func (Refine) Kind() string             { return "refine" }
