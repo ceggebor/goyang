@@ -1,4 +1,4 @@
-module github.com/vleijon/goyang
+module github.com/ceggebor/goyang
 
 go 1.17
 
