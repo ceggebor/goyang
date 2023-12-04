@@ -30,12 +30,12 @@ import (
 var Path []string
 var pathMap = map[string]bool{} // prevent adding dups in Path
 
-// AddPath adds the directories specified in p, a colon separated list
+// AddPath adds the directories specified in p, a comma separated list
 // of directory names, to Path, if they are not already in Path. Using
 // multiple arguments is also supported.
 func AddPath(paths ...string) {
 	for _, path := range paths {
-		for _, p := range strings.Split(path, ":") {
+		for _, p := range strings.Split(path, ",") {
 			if !pathMap[p] {
 				pathMap[p] = true
 				Path = append(Path, p)
