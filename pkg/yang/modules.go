@@ -270,6 +270,9 @@ func (ms *Modules) process() []error {
 	for _, m := range ms.Modules {
 		mods = append(mods, m)
 	}
+	for _, m := range ms.SubModules {
+		mods = append(mods, m)
+	}
 	for _, m := range mods {
 		if err := ms.include(m); err != nil {
 			errs = append(errs, err)
