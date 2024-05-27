@@ -73,6 +73,7 @@ func init() {
 // that parse (nearly) the same.
 var aliases = map[string]string{
 	"submodule": "module",
+	"tailf:action": "action",
 }
 
 // BuildAST builds an abstract syntax tree based on the yang statement s.
@@ -147,6 +148,9 @@ func build(s *Statement, p reflect.Value) (v reflect.Value, err error) {
 	// Now handle the substatements
 
 	for _, ss := range s.statements {
+		if a := aliases[ss.Keyword]; a != "" {
+			ss.Keyword = a
+		}
 		found[ss.Keyword] = true
 		fn := y.funcs[ss.Keyword]
 		parts := strings.Split(ss.Keyword, ":")
